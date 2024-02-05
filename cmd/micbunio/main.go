@@ -67,7 +67,5 @@ func initApp() *App {
 
 func main() {
 	log.Println("Server is running on port 8080")
-	if err := initApp().ServeWeb(); err != nil {
-		log.Println("failed to serve", err.Error())
-	}
+	initApp().ServeWeb()
 }
