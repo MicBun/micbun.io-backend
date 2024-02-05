@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"os"
 )
 
 type App struct {
@@ -41,8 +42,10 @@ func (a *App) ServeWeb() error {
 }
 
 func initApp() *App {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalln("Server failed to load env file", err.Error())
+	if os.Getenv("ENV") != "production" {
+		if err := godotenv.Load(".env"); err != nil {
+			log.Fatalln("Server failed to load env file", err.Error())
+		}
 	}
 
 	redisDB := db.NewRedisManager(db.NewRedis())
