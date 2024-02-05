@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+package blogs;
+option go_package = ".;blogs";
+
+service BlogService {
+  rpc ListTest(GetBlogListRequest) returns (GetBlogListResponse);
+  rpc GetBlogList(GetBlogListRequest) returns (GetBlogListResponse);
+  rpc GetBlog(GetBlogRequest) returns (GetBlogResponse);
+  rpc CreateComment(CreateCommentRequest) returns (google.protobuf.Empty);
+  rpc GetCommentList(GetCommentListRequest) returns (GetCommentListResponse);
+}
+
+message Comment {
+  int64 id = 1;
+  int64 blog_id = 2;
+  string name = 3;
+  string content = 4;
+  string created_at = 5;
+}
+
+message Blog {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  string created_at = 4;
+}
+
+message GetBlogListRequest {
+  int64 limit = 1;
+  int64 offset = 2;
+}
+
+message GetBlogListResponse {
+  repeated Blog blogs = 1;
+}
+
+message GetBlogRequest {
+  int64 id = 1;
+}
+
+message GetBlogResponse {
+  Blog blog = 1;
+}
+
+message CreateCommentRequest {
+  int64 blog_id = 1;
+  string content = 2;
+  string name = 3;
+}
+
+message GetCommentListRequest {
+  int64 blog_id = 1;
+  int64 limit = 2;
+  int64 offset = 3;
+}
+
+message GetCommentListResponse {
+  repeated Comment comments = 1;
+}
+
+// how to regenerate the proto file for backend golang
+// protoc --go_out=paths=source_relative:. --twirp_out=paths=source_relative:. rpc/micbunio/blog.proto
+
+// how to regenerate the proto file for frontend javascript
+// prerequisite:
+// npm install -g twirpscript
+// run:
+// npx twirpscript
