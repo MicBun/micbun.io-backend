@@ -18,7 +18,7 @@ func NewComment(db *gorm.DB) *Comment {
 
 func (c *Comment) GetCommentList(ctx context.Context, req *blog.GetCommentListRequest) (*blog.GetCommentListResponse, error) {
 	var commentModels []model.Comment
-	if err := c.db.WithContext(ctx).Debug().
+	if err := c.db.WithContext(ctx).
 		Limit(int(req.Limit)).
 		Offset(int(req.Offset)).
 		Order("created_at desc").
