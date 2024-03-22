@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 	"os"
 )
 
@@ -39,7 +38,6 @@ func NewPostgres() (*gorm.DB, error) {
 		if err != nil {
 			return nil, err
 		}
-		log.Printf("connected to postgres: %s", dsn)
 
 		gormInstance = gormDB
 	}

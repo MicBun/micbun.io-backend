@@ -44,7 +44,7 @@ func (c *Comment) GetCommentList(ctx context.Context, req *blog.GetCommentListRe
 }
 
 func (c *Comment) CreateComment(ctx context.Context, req *blog.CreateCommentRequest) error {
-	return c.db.WithContext(ctx).Debug().Create(&model.Comment{
+	return c.db.WithContext(ctx).Create(&model.Comment{
 		BlogID:  uint(req.BlogId),
 		Content: req.Content,
 		Name:    req.Name,
