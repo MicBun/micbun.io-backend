@@ -29,6 +29,7 @@ func NewRedis() *redis.Client {
 	if address == "" {
 		address = os.Getenv("REDIS_HOST") + ":" + fmt.Sprint(os.Getenv("REDIS_PORT"))
 	}
+	log.Printf("redis address: %s", address)
 
 	opt, err := redis.ParseURL(address)
 	if err != nil {
@@ -49,6 +50,7 @@ func (m *Redis) Get(ctx context.Context, key string, value any) error {
 	} else if err != nil {
 		return errors.WithStack(err)
 	}
+	log.Printf("get value from redis key: %s, value: %s", key, result)
 
 	return errors.WithStack(json.Unmarshal([]byte(result), value))
 }
