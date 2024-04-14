@@ -2,10 +2,9 @@ package model
 
 import "gorm.io/gorm"
 
-type Comment struct {
+type Guestbook struct {
 	gorm.Model
-	BlogID  uint
-	Content string
 	Name    string
-	Blog    Blog
+	Content string
+	HostURL string
 }

@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+package micbunio;
+option go_package = ".;micbunio";
+
+service GuestbookService {
+  rpc GetGuestbookList(GetGuestbookListRequest) returns (GetGuestbookListResponse);
+  rpc CreateGuestbook(CreateGuestbookRequest) returns (google.protobuf.Empty);
+}
+
+message CreateGuestbookRequest {
+  string name = 1;
+  string content = 2;
+  string host_url = 3;
+}
+
+message Guestbook {
+  int64 id = 1;
+  string name = 2;
+  string content = 3;
+  string created_at = 4;
+}
+
+message GetGuestbookListResponse {
+  repeated Guestbook guestbooks = 1;
+}
+
+message GetGuestbookListRequest {
+  int64 limit = 1;
+  int64 offset = 2;
+  string host_url = 3;
+}
+
+// how to regenerate the proto file for backend golang
+// protoc --go_out=paths=source_relative:. --twirp_out=paths=source_relative:. rpc/micbunio/blog.proto
+
+// how to regenerate the proto file for frontend javascript
+// prerequisite:
+// npm install -g twirpscript
+// run:
+// npx twirpscript

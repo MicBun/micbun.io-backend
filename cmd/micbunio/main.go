@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/MicBun/micbun.io-backend/internal/micbunioserver/blog"
-	"github.com/MicBun/micbun.io-backend/internal/micbunioserver/blog/repo"
+	"github.com/MicBun/micbun.io-backend/internal/micbunioserver"
 	"github.com/MicBun/micbun.io-backend/internal/micbunioserver/db"
-	pb "github.com/MicBun/micbun.io-backend/rpc/micbunio"
+	"github.com/MicBun/micbun.io-backend/internal/micbunioserver/repo"
+	"github.com/MicBun/micbun.io-backend/rpc/micbunio"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/rs/cors"
@@ -15,13 +15,13 @@ import (
 )
 
 type App struct {
-	twirpHandler pb.TwirpServer
+	twirpHandler micbunio.TwirpServer
 	redisDB      *db.Redis
 	postgres     *gorm.DB
 }
 
 func NewApp(
-	twirpHandler pb.TwirpServer,
+	twirpHandler micbunio.TwirpServer,
 	redisDB *db.Redis,
 	postgres *gorm.DB,
 ) *App {
@@ -33,12 +33,9 @@ func NewApp(
 }
 
 func (a *App) ServeWeb() error {
-	corsWrapper := cors.New(cors.Options{
+	return errors.WithStack(http.ListenAndServe(":8080", cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
-	})
-	handler := corsWrapper.Handler(a.twirpHandler)
-
-	return errors.WithStack(http.ListenAndServe(":8080", handler))
+	}).Handler(a.twirpHandler)))
 }
 
 func initApp() *App {
@@ -53,13 +50,12 @@ func initApp() *App {
 	if err != nil {
 		log.Fatalln("Server failed to connect postgres", err.Error())
 	}
-	blogRepo := repo.NewBlog(postgres)
-	commentRepo := repo.NewComment(postgres)
-	blogManager := blog.NewPbBlogServer(redisDB, blogRepo, commentRepo)
-	twirpHandler := pb.NewBlogServiceServer(blogManager)
+
+	guestbookRepo := repo.NewGuestbook(postgres)
+	service := micbunioserver.NewPbService(redisDB, guestbookRepo)
 
 	return NewApp(
-		twirpHandler,
+		micbunio.NewGuestbookServiceServer(service),
 		redisDB,
 		postgres,
 	)
@@ -67,7 +63,6 @@ func initApp() *App {
 
 func main() {
 	log.Println("Server is running on port 8080")
-
 	if err := initApp().ServeWeb(); err != nil {
 		log.Fatalln("Server failed to start", err.Error())
 	}

@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/MicBun/micbun.io-backend/internal/micbunioserver/blog/model"
+	"github.com/MicBun/micbun.io-backend/internal/micbunioserver/model"
 	"github.com/pkg/errors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -42,11 +42,7 @@ func NewPostgres() (*gorm.DB, error) {
 		gormInstance = gormDB
 	}
 
-	if err := gormInstance.AutoMigrate(&model.Blog{}); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if err := gormInstance.AutoMigrate(&model.Comment{}); err != nil {
+	if err := gormInstance.AutoMigrate(&model.Guestbook{}); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
