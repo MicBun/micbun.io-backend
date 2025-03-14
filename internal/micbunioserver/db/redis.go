@@ -47,7 +47,7 @@ func NewRedisManager(client *redis.Client) *Redis {
 
 func (m *Redis) Get(ctx context.Context, key string, value any) {
 	result, err := m.client.Get(ctx, key).Result()
-	if !errors.Is(err, redis.Nil) {
+	if err != nil && !errors.Is(err, redis.Nil) {
 		log.Println("redis get error: ", errors.WithStack(err))
 		return
 	}

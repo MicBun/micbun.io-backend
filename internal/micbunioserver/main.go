@@ -6,6 +6,7 @@ import (
 	"github.com/MicBun/micbun.io-backend/internal/micbunioserver/db"
 	"github.com/MicBun/micbun.io-backend/rpc/micbunio"
 	"github.com/golang/protobuf/ptypes/empty"
+	"time"
 )
 
 type PbService struct {
@@ -41,7 +42,7 @@ func (s *PbService) GetGuestbookList(ctx context.Context, in *micbunio.GetGuestb
 		return nil, err
 	}
 
-	s.redisManager.SetEx(ctx, redisKey, guestbooks, 5)
+	s.redisManager.SetEx(ctx, redisKey, guestbooks, 5*time.Minute)
 	return guestbooks, nil
 }
 
