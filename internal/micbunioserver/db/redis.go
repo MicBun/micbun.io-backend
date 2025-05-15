@@ -47,13 +47,21 @@ func NewRedisManager(client *redis.Client) *Redis {
 
 func (m *Redis) Get(ctx context.Context, key string, value any) {
 	result, err := m.client.Get(ctx, key).Result()
-	if err != nil && !errors.Is(err, redis.Nil) {
-		log.Println("redis get error: ", errors.WithStack(err))
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			// cache miss – nothing to unmarshal
+			return
+		}
+		log.Println("redis get error:", errors.WithStack(err))
 		return
 	}
 
-	if err = json.Unmarshal([]byte(result), value); err != nil {
-		log.Println("redis unmarshal error: ", errors.WithStack(err))
+	// only unmarshal when we actually got something
+	if len(result) == 0 {
+		return
+	}
+	if err := json.Unmarshal([]byte(result), value); err != nil {
+		log.Println("redis unmarshal error:", errors.WithStack(err))
 	}
 }
 
