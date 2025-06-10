@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -27,15 +28,29 @@ func NewRedis() *redis.Client {
 		address = os.Getenv("REDIS_EXTERNAL_URL")
 	}
 	if address == "" {
-		address = os.Getenv("REDIS_HOST") + ":" + fmt.Sprint(os.Getenv("REDIS_PORT"))
+		host := os.Getenv("REDIS_HOST")
+		port := os.Getenv("REDIS_PORT")
+		if host != "" && port != "" {
+			address = fmt.Sprintf("%s:%s", host, port)
+		}
 	}
 	if address == "" {
 		return nil
 	}
 
-	opt, err := redis.ParseURL(address)
-	if err != nil {
-		log.Println("redis parse url error: ", err)
+	var (
+		opt *redis.Options
+		err error
+	)
+
+	if strings.HasPrefix(address, "redis://") || strings.HasPrefix(address, "rediss://") || strings.HasPrefix(address, "unix://") {
+		opt, err = redis.ParseURL(address)
+		if err != nil {
+			log.Println("redis parse url error:", err)
+			return nil
+		}
+	} else {
+		opt = &redis.Options{Addr: address}
 	}
 
 	return redis.NewClient(opt)
